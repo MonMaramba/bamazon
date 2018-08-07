@@ -1,6 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
-var Table = require("cli-table");
+var cTable = require("console.table");
 
 //connection setup
 var connection = mysql.createConnection({
@@ -22,19 +22,53 @@ connection.connect(function(err) {
       });
 
       
-
+  var resp;
   var query = "SELECT * FROM products";
   
-  
+  var productsMenu = function(){
   connection.query(query, function(error, response){
     if (error) throw error;
-    for (var i =0; i < response.length; i++) {
+    /*for (var i =0; i < response.length; i++) {
       console.log("Item ID: " + response[i].id + "  || Product Name: " + response[i].product_name + " || Department: " + response[i].department_name + " || Price: $" + response[i].price + " || Quantity in Stock: " + response[i].stock_quantity);
+      resp = response;*/
+      console.table(response); 
+      customerBuys();
       
-    }
-
+      
+    //console.log(response);
     //console.log(table.toString);
-    connection.end();
+       
   })
+  }
+var customerBuys = function() {
   
   
+  inquirer.prompt([{
+    type: "input",
+    name: "id",
+    message: "Please select the Item ID that you wish to purchase."
+   },
+  {
+    type: "input",
+    name: "quantity",
+    message: "How many do you require?"
+  }
+]) .then (function(inquirerRes){
+    console.log(inquirerRes.id);
+    console.log(inquirerRes.quantity);
+    connection.end();
+    /*var productChoice;
+    if (inquirerRes.id !== resp.id[i]){
+      return "Please enter a whole non-zero number."
+    } else {
+      productChoice = 
+    }
+    var productQ;
+    if(inquirerRes.quantity > ){
+
+    }*/
+
+  })
+}
+productsMenu();
+
