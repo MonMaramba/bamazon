@@ -41,33 +41,63 @@ connection.connect(function(err) {
   })
   }
 var customerBuys = function() {
-  
-  
-  inquirer.prompt([{
+    inquirer.prompt([{
     type: "input",
     name: "id",
-    message: "Please select the Item ID that you wish to purchase."
+    message: "Please select the Item ID that you wish to purchase.",
+    validate: function(value) {
+      if (isNaN(value) == false) {
+        return true;
+      } else {
+        return false;
+      }
+    }
    },
   {
     type: "input",
     name: "quantity",
-    message: "How many do you require?"
+    message: "How many do you require?",
+    validate: function(value) {
+      if (isNaN(value) == false) {
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 ]) .then (function(inquirerRes){
-    console.log(inquirerRes.id);
-    console.log(inquirerRes.quantity);
-    connection.end();
+  var chosenID = inquirerRes.id;
+  var chosenQuantity = inquirerRes.quantity;
+  connection.query("SELECT * FROM products WHERE ?",
+  {
+    id: chosenID
+  }, function(err, resp){
+    
+    for(i=0; i<resp.length; i++){
+      var productToBuy = resp[i].product_name;
+      var productQuantity = resp[i].stock_quantity;
+      console.log(productToBuy);
+      console.log(productQuantity);
+    }
+    
+  })
+    //console.log(inquirerRes.id);
+    //console.log(inquirerRes.quantity);
     /*var productChoice;
+
+
     if (inquirerRes.id !== resp.id[i]){
       return "Please enter a whole non-zero number."
     } else {
-      productChoice = 
+      productChoice = inquirerRes
     }
     var productQ;
     if(inquirerRes.quantity > ){
 
     }*/
 
+    connection.end();
+    
   })
 }
 productsMenu();
