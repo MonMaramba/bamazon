@@ -10,7 +10,7 @@ var connection = mysql.createConnection({
 
   user: "root",
 
-  password: "",
+  password: "DamnSQL1!",
   database: "bamazon_db"
 });
 
@@ -33,14 +33,10 @@ connection.connect(function(err) {
       resp = response;*/
       console.table(response); 
       customerBuys();
-      
-      
-    //console.log(response);
-    //console.log(table.toString);
-       
-  })
+    })
   }
 var customerBuys = function() {
+  
     inquirer.prompt([{
     type: "input",
     name: "id",
@@ -83,19 +79,6 @@ var customerBuys = function() {
   })
     //console.log(inquirerRes.id);
     //console.log(inquirerRes.quantity);
-    /*var productChoice;
-
-
-    if (inquirerRes.id !== resp.id[i]){
-      return "Please enter a whole non-zero number."
-    } else {
-      productChoice = inquirerRes
-    }
-    var productQ;
-    if(inquirerRes.quantity > ){
-
-    }*/
-
     connection.end();
     
   })
