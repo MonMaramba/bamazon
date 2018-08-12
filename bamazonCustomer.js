@@ -15,46 +15,43 @@ var connection = mysql.createConnection({
 });
 
 //connect to sql database
-connection.connect(function(err) {
-    if (err) throw err;
-    console.log("connected as id " + connection.threadId);
-    //productTable();
-      });
+connection.connect(function (err) {
+  if (err) throw err;
+  console.log("connected as id " + connection.threadId);
+  //productTable();
+});
 
-      
-  var productTotal;
-  var query = "SELECT * FROM products";
-  
-  var productsMenu = function(){
-  connection.query(query, function(error, response){
+
+var productTotal;
+var query = "SELECT * FROM products";
+
+var productsMenu = function () {
+  connection.query(query, function (error, response) {
     if (error) throw error;
-        
-      console.table(response); 
-      productTotal = response.length;
-      console.log(productTotal);
-      customerBuys();
-    })
-  }
+    console.table(response);
+    productTotal = response.length;
+    customerBuys();
+  })
+}
 
-var customerBuys = function() {
-  
-    inquirer.prompt([{
+var customerBuys = function () {
+  inquirer.prompt([{
     type: "input",
     name: "id",
     message: "Please select the Item ID that you wish to purchase.",
-    validate: function(value) {
-    if (isNaN(value) == false) {
+    validate: function (value) {
+      if (isNaN(value) == false) {
         return true;
       } else {
         return false;
       }
     }
-   },
+  },
   {
     type: "input",
     name: "quantity",
     message: "How many do you require?",
-    validate: function(value) {
+    validate: function (value) {
       if (isNaN(value) == false) {
         return true;
       } else {
@@ -62,72 +59,71 @@ var customerBuys = function() {
       }
     }
   }
-]) .then (function(inquirerRes){
-  var chosenID = inquirerRes.id;
-  var chosenQuantity = inquirerRes.quantity;
-  var productQuantity;
-  var productCost;
+  ]).then(function (inquirerRes) {
+    var chosenID = inquirerRes.id;
+    var chosenQuantity = inquirerRes.quantity;
+    var productQuantity;
+    var productCost;
 
-  function totalCost(a, b){
-    var custTotal = a * b;
-    
-    console.log("Total amount due is $ " + custTotal.toFixed(2) + " \n");
-  }
+    function totalCost(a, b) {
+      var custTotal = a * b;
 
-  function updateQ() {
-    var newQ = productQuantity - chosenQuantity;
+      console.log("Total amount due is $ " + custTotal.toFixed(2) + " \n");
+      buyOrGo();
+    }
+    function buyOrGo() {
+      inquirer.prompt ([{
+        type: "list",
+        name: "buyOrGo",
+        choices: ["yes", "no"],
+        message: "Do you need something else today?"
+      }]) .then(function(inquirerResponse){
+        if(inquirerResponse.buyOrGo === "yes"){
+          productsMenu();
+        }else {
+          connection.end();
+        }
+      })
+    }
+
+    function updateQ() {
+      var newQ = productQuantity - chosenQuantity;
       connection.query("UPDATE PRODUCTS SET ? WHERE ?", [{
         stock_quantity: newQ
-      }, 
+      },
       {
         id: chosenID
-      }]), function(error2, res){
-        console.log(res.affecteRows + " products updated!\n");
+      }]), function (error2, res) {
+        
         productsMenu();
       }
-}
-  
-  connection.query("SELECT * FROM products WHERE ?",
-  {
-    id: chosenID
-  }, function(err, resp){
-    
-    for(i=0; i<resp.length; i++){
-      var productToBuy = resp[i].product_name;
-          productQuantity = resp[i].stock_quantity;
-          productCost = resp[i].price;
-      /*console.log(productCost);
-      console.log(resp.length);
-      console.log(productToBuy);
-      console.log(productQuantity);*/
     }
-    if(chosenQuantity > productQuantity) {
-      console.log("Our apologies, we currently do not have enough stock to fulfill your order. We are going to replenish stock soon. Thank you.");
-    } else {
-      console.log("Thank you for choosing us for your needs today. Your order of " + chosenQuantity + " " + productToBuy + " is being processed");
-      totalCost(chosenQuantity, productCost)
-      updateQ()
-    }
-    productsMenu();
-  })
-    
-    
-    
-  })
-  
-}
-//connection.end();
-/*function updateQ() {
-    var newQ = productQuantity - chosenQuantity;
-      connection.query("UPDATE PRODUCTS SET ? WHERE ?", [{
-        stock_quantity: newQ
-      }, 
+
+    connection.query("SELECT * FROM products WHERE ?",
       {
         id: chosenID
-      }]), function(error2, res){
-        console.log(res.affecteRows + " products updated!\n");
+      }, function (err, resp) {
+
+        for (i = 0; i < resp.length; i++) {
+          var productToBuy = resp[i].product_name;
+          productQuantity = resp[i].stock_quantity;
+          productCost = resp[i].price;
+
+        }
+        if (chosenQuantity > productQuantity) {
+          console.log("Our apologies, we currently do not have enough stock to fulfill your order. We are going to replenish stock soon. Thank you. \n");
+        } else {
+          console.log("Thank you for choosing us for your needs today. Your order of " + chosenQuantity + " " + productToBuy + " is being processed" + " \n");
+          totalCost(chosenQuantity, productCost)
+          updateQ()
+        }
+
         //productsMenu();
-      }
-}*/
+      })
+
+  })
+
+}
+
 productsMenu();
 
