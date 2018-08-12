@@ -81,6 +81,7 @@ var customerBuys = function () {
         if(inquirerResponse.buyOrGo === "yes"){
           productsMenu();
         }else {
+          console.log("Thank you for visiting Bamazon. See you soon.")
           connection.end();
         }
       })
@@ -112,6 +113,7 @@ var customerBuys = function () {
         }
         if (chosenQuantity > productQuantity) {
           console.log("Our apologies, we currently do not have enough stock to fulfill your order. We are going to replenish stock soon. Thank you. \n");
+          buyOrGo();
         } else {
           console.log("Thank you for choosing us for your needs today. Your order of " + chosenQuantity + " " + productToBuy + " is being processed" + " \n");
           totalCost(chosenQuantity, productCost)
