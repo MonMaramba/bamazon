@@ -13,7 +13,7 @@ var connection = mysql.createConnection({
   password: "DamnSQL1!",
   database: "bamazon_db"
 });
-var productTotal;
+
 //connect to sql database
 connection.connect(function(err) {
     if (err) throw err;
@@ -22,46 +22,28 @@ connection.connect(function(err) {
       });
 
       
-  var resp;
+  var productTotal;
   var query = "SELECT * FROM products";
   
   var productsMenu = function(){
   connection.query(query, function(error, response){
     if (error) throw error;
-    var item_ids = [];
-    /*for (var i =0; i < response.length; i++) {
-      console.log("Item ID: " + response[i].id + "  || Product Name: " + response[i].product_name + " || Department: " + response[i].department_name + " || Price: $" + response[i].price + " || Quantity in Stock: " + response[i].stock_quantity);
-      resp = response;*/
+        
       console.table(response); 
-      /*for(var j= 0; j < response.length; j++){
-      items_ids.push(respose[i].id);
-      }*/
       productTotal = response.length;
       console.log(productTotal);
       customerBuys();
     })
   }
-  function updateQ() {
-    var newQ = productQuantity - chosenQuantity;
-      connection.query("UPDATE PRODUCTS SET ? WHERE ?", [{
-        stock_quantity: newQ
-      }, 
-      {
-        id: chosenID
-      }]), function(error2, res){
-        console.log(res.affecteRows + " products updated!\n");
-        //productsMenu();
-      }
-}
 
-var customerBuys = function(item_ids) {
+var customerBuys = function() {
   
     inquirer.prompt([{
     type: "input",
     name: "id",
     message: "Please select the Item ID that you wish to purchase.",
     validate: function(value) {
-    if (isNaN(value) == false/* && item_ids.indexOf(value) !== -1*/) {
+    if (isNaN(value) == false) {
         return true;
       } else {
         return false;
@@ -84,6 +66,13 @@ var customerBuys = function(item_ids) {
   var chosenID = inquirerRes.id;
   var chosenQuantity = inquirerRes.quantity;
   var productQuantity;
+  var productCost;
+
+  function totalCost(a, b){
+    var custTotal = a * b;
+    
+    console.log("Total amount due is $ " + custTotal.toFixed(2) + " \n");
+  }
 
   function updateQ() {
     var newQ = productQuantity - chosenQuantity;
@@ -105,16 +94,18 @@ var customerBuys = function(item_ids) {
     
     for(i=0; i<resp.length; i++){
       var productToBuy = resp[i].product_name;
-       productQuantity = resp[i].stock_quantity;
-
+          productQuantity = resp[i].stock_quantity;
+          productCost = resp[i].price;
+      /*console.log(productCost);
       console.log(resp.length);
       console.log(productToBuy);
-      console.log(productQuantity);
+      console.log(productQuantity);*/
     }
     if(chosenQuantity > productQuantity) {
       console.log("Our apologies, we currently do not have enough stock to fulfill your order. We are going to replenish stock soon. Thank you.");
     } else {
       console.log("Thank you for choosing us for your needs today. Your order of " + chosenQuantity + " " + productToBuy + " is being processed");
+      totalCost(chosenQuantity, productCost)
       updateQ()
     }
     productsMenu();
